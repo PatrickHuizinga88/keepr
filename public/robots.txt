@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /
+Allow: /login
+Allow: /sign-up
+Allow: /password-recovery
+Allow: /terms-of-service
+Allow: /privacy-policy
+Sitemap: https://www.example.com/sitemap.xml
