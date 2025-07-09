@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {Page} from "../components/ui/page";
 import {ExternalLink} from "lucide-vue-next";
 import type {Database} from "~/types/database.types";
+import {SUPPORT_EMAIL as supportEmail} from "~/constants";
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
@@ -14,7 +14,7 @@ useHead({
 
 const {data: profile} = await useAsyncData('accountProfile', async () => {
   const {data} = await supabase.from('profiles')
-      .select('first_name,last_name,plan')
+      .select('name,plan')
       .eq('user_id', user.value?.id)
       .single()
   return data
@@ -44,11 +44,12 @@ const navigateToStripeDashboard = async () => {
 </script>
 
 <template>
-  <Page :title="$t('account.account')" :description="$t('account.manage_your_account')">
+  <div class="container">
+    <h1 class="my-8">{{ $t('account.account') }}</h1>
 
     <section id="profile-information">
       <h2 class="h3 mb-4">{{ $t('account.profile.profile_information') }}</h2>
-      <FormProfile v-if="profile" :first_name="profile.first_name" :last_name="profile.last_name"/>
+      <FormProfile v-if="profile" :name="profile.name"/>
     </section>
 
     <Separator class="w-full my-12"/>
@@ -65,7 +66,8 @@ const navigateToStripeDashboard = async () => {
       <div class="grid sm:grid-cols-2 gap-6">
         <div class="space-y-1.5">
           <Label id="plan-label" as="span">{{ $t('account.billing.current_plan') }}</Label>
-          <span class="block text-lg font-semibold text-primary" aria-describedby="plan-label">{{ $t(`pricing.plans.${profile.plan}`) }}</span>
+          <span class="block text-lg font-semibold text-primary"
+                aria-describedby="plan-label">{{ $t(`pricing.plans.${profile.plan}`) }}</span>
         </div>
         <div class="space-y-3">
           <Dialog>
@@ -88,7 +90,8 @@ const navigateToStripeDashboard = async () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <Button v-if="profile.plan !== 'free'" variant="outline" size="sm" @click="navigateToStripeDashboard()" class="w-full">
+          <Button v-if="profile.plan !== 'free'" variant="outline" size="sm" @click="navigateToStripeDashboard()"
+                  class="w-full">
             {{ $t('account.billing.manage_subscription') }}
             <ExternalLink/>
           </Button>
@@ -110,14 +113,14 @@ const navigateToStripeDashboard = async () => {
       <h2 class="h3 text-destructive mb-2">{{ $t('account.danger_zone.danger_zone') }}</h2>
       <!-- TODO - Setup: Change support email -->
       <p class="text-muted-foreground text-sm mb-6">{{ $t('account.danger_zone.explanation') }} <a
-          href="mailto:support@example.com" class="text-primary underline">support@example.com</a>.</p>
+          :href="`mailto:${supportEmail}`" class="text-primary-dark underline">{{ supportEmail }}</a>.</p>
       <!--    <p class="text-muted-foreground text-sm mb-6">Once you delete your account, there is no going back. Please be certain.</p>-->
       <!--          <Button variant="outline" size="sm">-->
       <!--            <Trash class="size-4"/>-->
       <!--            {{ $t('account.anger_zone.delete_account') }}-->
       <!--          </Button>-->
     </section>
-  </Page>
+  </div>
 </template>
 
 <style scoped>

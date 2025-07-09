@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Domine:wght@400;700&family=Fuzzy+Bubbles:wght@400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @layer base {
   :root {
-    --background: hsl(0 0% 100%);
+    --background: hsl(330 50% 95%);
     --foreground: hsl(240 10% 3.9%);
 
     --popover: hsl(0 0% 100%);
@@ -18,8 +16,8 @@
     --border: hsl(240 5.9% 90%);
     --input: hsl(240 5.9% 90%);
 
-    --primary: hsl(240 100% 66%);
-    --primary-foreground: hsl(0 0% 98%);
+    --primary: hsl(330 100% 85%);
+    --primary-foreground: hsl(240 10% 3.9%);
 
     --secondary: hsl(240 4.8% 95.9%);
     --secondary-foreground: hsl(240 10% 3.9%);
@@ -51,28 +49,6 @@
     --chart-3: hsl(197 37% 24%);
     --chart-4: hsl(43 74% 66%);
     --chart-5: hsl(27 87% 67%);
-  }
-
-  .dark {
-    --background: hsl(240 10% 5%);
-    --foreground: hsl(0 0% 98%);
-
-    --popover: hsl(240 10% 5%);
-    --popover-foreground: hsl(0 0% 98%);
-
-    --card: hsl(240 10% 5%);
-    --card-foreground: hsl(0 0% 98%);
-
-    --border: hsl(240 3.7% 15.9%);
-    --input: hsl(240 3.7% 15.9%);
-
-    --primary: hsl(240 100% 74%);
-
-    --secondary: hsl(240 4.8% 12%);
-    --secondary-foreground: hsl(0 0% 98%);
-
-    --muted: hsl(240 6% 10%);
-    --muted-foreground: hsl(240 5% 65%);
   }
 }
 
@@ -121,6 +97,8 @@
 
 @theme {
   --font-sans: 'Inter', 'sans-serif';
+  --font-serif: 'Domine', 'serif';
+  --font-cursive: 'Fuzzy Bubbles', 'cursive';
 
   --radius-xl: calc(var(--radius) + 4px);
   --radius-lg: var(--radius);
@@ -156,16 +134,22 @@
   html {
     @apply bg-background text-foreground;
   }
+  h1, .h1,
+  h2, .h2,
+  h3, .h3,
+  h4, .h4 {
+    @apply font-serif;
+  }
   h1:is(h1), .h1 {
-    @apply text-[2rem] leading-[1.1] font-bold;
+    @apply text-[2rem] sm:text-[2.5rem] leading-[1.2];
   }
   h2:is(h2), .h2 {
-    @apply text-[1.5rem] leading-[1.2] font-semibold;
+    @apply text-[1.75rem] sm:text-[2rem] leading-[1.3];
   }
   h3:is(h3), .h3 {
-    @apply text-[1.25rem] leading-[1.3] font-semibold;
+    @apply text-[1.5rem] sm:text-[1.75rem] leading-[1.4];
   }
   h4:is(h4), .h4 {
-    @apply text-[1rem] leading-[1.4] font-medium;
+    @apply text-[1.25rem] sm:text-[1.5rem] leading-[1.5];
   }
 }

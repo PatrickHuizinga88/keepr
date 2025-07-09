@@ -11,6 +11,12 @@ export default {
     upgrade: "Upgrade",
     upgrade_now: "Upgrade now",
 
+    plans: {
+      free: "Free",
+      premium_monthly: "Premium Monthly",
+      premium_yearly: "Premium Yearly",
+    },
+
     upgrade_confirmation: {
       title: {
         success: "Purchase successful",

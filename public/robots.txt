@@ -5,4 +5,4 @@ Allow: /sign-up
 Allow: /password-recovery
 Allow: /terms-of-service
 Allow: /privacy-policy
-Sitemap: https://www.example.com/sitemap.xml
+Sitemap: https://www.getkeepr.app/sitemap.xml

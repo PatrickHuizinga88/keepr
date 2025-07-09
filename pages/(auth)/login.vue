@@ -11,6 +11,7 @@ definePageMeta({
 
 const supabase = useSupabaseClient()
 const {t} = useI18n()
+const localePath = useLocalePath()
 
 useHead({
   title: t('authentication.common.sign_in'),
@@ -33,7 +34,7 @@ const form = useForm({
 const onSubmit = form.handleSubmit(async (values) => {
   try {
     loading.value = true
-    const {error} = await supabase.auth.signInWithPassword({
+    const {data, error} = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password
     })
@@ -41,7 +42,17 @@ const onSubmit = form.handleSubmit(async (values) => {
       loading.value = false
       throw error
     }
-    navigateTo('/')
+
+    const {data: profile} = await supabase
+        .from('profiles')
+        .select('onboarding_completed_at')
+        .eq('user_id', data.user.id)
+        .single()
+    if (profile && profile.onboarding_completed_at) {
+      await navigateTo('/')
+      return
+    }
+    await navigateTo(localePath('onboarding'))
   } catch (error) {
     errorMessage.value = t('authentication.login.sign_in_failed')
     console.error(error)

@@ -1,25 +1,31 @@
 <script setup lang="ts">
-import {Sidebar} from "~/components/ui/sidebar";
-import {Toaster} from "~/components/ui/toast";
+import {UserCircle} from 'lucide-vue-next'
+import Toaster from "~/components/ui/toast/Toaster.vue";
+import {APP_NAME as appName} from "~/constants";
+import {useToastStore} from "~/stores/toastStore";
 
 const toastStore = useToastStore()
-const userStore = useUserStore()
-
-await userStore.fetchUserRole()
 </script>
 
 <template>
-
   <NuxtLoadingIndicator color="var(--primary)"/>
-
-  <Sidebar ref="sidebar"/>
-
-  <div class="lg:pl-64 overflow-x-hidden">
+  <header class="bg-background">
     <div class="container">
-      <div class="pb-6">
-        <slot/>
-      </div>
+      <nav class="h-16 flex justify-between items-center gap-8">
+        <NuxtLinkLocale to="/">
+          <img src="/logo.svg" :alt="appName" class="h-9">
+        </NuxtLinkLocale>
+        <Button variant="ghost" size="icon" as-child>
+          <NuxtLinkLocale to="account">
+            <UserCircle/>
+          </NuxtLinkLocale>
+        </Button>
+      </nav>
     </div>
+  </header>
+
+  <div class="pb-6 sm:pb-10">
+    <slot/>
   </div>
 
   <Toaster :toasts="toastStore.toasts"/>

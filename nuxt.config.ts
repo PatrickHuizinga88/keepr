@@ -50,7 +50,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/supabase',
     '@vueuse/nuxt',
-    '@nuxtjs/color-mode',
+    // '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
     'dayjs-nuxt',
     'shadcn-nuxt',
@@ -74,9 +74,10 @@ export default defineNuxtConfig({
     componentDir: './components/ui',
   },
 
-  colorMode: {
-    classSuffix: '',
-  },
+  // colorMode: {
+  //   preference: 'light',
+  //   classSuffix: '',
+  // },
 
   i18n: {
     strategy: 'prefix_except_default',
@@ -90,13 +91,10 @@ export default defineNuxtConfig({
           'en/404.ts',
           'en/account.ts',
           'en/authentication.ts',
-          'en/customers.ts',
-          'en/dashboard.ts',
+          'en/home.ts',
           'en/feedback.ts',
           'en/legal.ts',
           'en/pricing.ts',
-          'en/settings.ts',
-          'en/users.ts'
         ]
       },
       {
@@ -107,13 +105,10 @@ export default defineNuxtConfig({
           'nl/404.ts',
           'nl/account.ts',
           'nl/authentication.ts',
-          'nl/customers.ts',
-          'nl/dashboard.ts',
+          'nl/home.ts',
           'nl/feedback.ts',
           'nl/legal.ts',
           'nl/pricing.ts',
-          'nl/settings.ts',
-          'nl/users.ts'
         ]
       },
     ],
@@ -123,25 +118,21 @@ export default defineNuxtConfig({
         en: '/account',
         nl: '/account',
       },
-      customers: {
-        en: '/customers',
-        nl: '/klanten',
-      },
-      'customers-create': {
-        en: '/customers/create',
-        nl: '/klanten/aanmaken',
-      },
-      'customers-[id]': {
-        en: '/customers/[id]',
-        nl: '/klanten/[id]',
-      },
-      'customers-[id]-edit': {
-        en: '/customers/[id]/edit',
-        nl: '/klanten/[id]/bewerken',
+      'collectionId-memories-slug': {
+        en: '/[collectionId]/memories/[slug]',
+        nl: '/[collectionId]/herinneringen/[slug]',
       },
       login: {
         en: '/login',
         nl: '/login',
+      },
+      'collectionId-memories-create': {
+        en: '/[collectionId]/memories/create',
+        nl: '/[collectionId]/herinneringen/aanmaken',
+      },
+      'memories-[slug]-edit': {
+        en: '/[collectionId]/memories/[slug]/edit',
+        nl: '/[collectionId]/herinneringen/[slug]/bewerken',
       },
       onboarding: {
         en: '/onboarding',
@@ -159,29 +150,9 @@ export default defineNuxtConfig({
         en: '/sign-up',
         nl: '/registreren',
       },
-      settings: {
-        en: '/settings',
-        nl: '/instellingen',
-      },
       'update-password': {
         en: '/update-password',
         nl: '/wachtwoord-bijwerken',
-      },
-      users: {
-        en: '/users',
-        nl: '/gebruikers',
-      },
-      'users-create': {
-        en: '/users/create',
-        nl: '/gebruikers/aanmaken',
-      },
-      'users-[id]': {
-        en: '/users/[id]',
-        nl: '/gebruikers/[id]',
-      },
-      'users-[id]-edit': {
-        en: '/users/[id]/edit',
-        nl: '/gebruikers/[id]/bewerken',
       },
     },
   },

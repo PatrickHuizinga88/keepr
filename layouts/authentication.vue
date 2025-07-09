@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {Toaster} from "~/components/ui/toast";
-import {APP_NAME} from "~/constants";
+import {APP_NAME as appname} from "~/constants";
 
 defineProps<{
   title?: string
@@ -13,7 +13,7 @@ const toastStore = useToastStore()
 <template>
   <div class="min-h-screen flex flex-col justify-center sm:bg-muted/50 py-12">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center px-6 sm:px-0 mb-4 sm:mb-6 md:mb-8 -mt-20 sm:mt-0">
-      <img src="/logo.svg" :alt="APP_NAME"
+      <img src="/logo.svg" :alt="appname"
            class="mx-auto h-12 w-auto starting:opacity-0 starting:translate-y-2 transition-all duration-500">
       <div class="text-center mt-10 starting:opacity-0 starting:translate-y-2 transition-all duration-500 delay-100">
         <h1 v-if="title" class="text-3xl font-bold tracking-tight">{{ title }}</h1>

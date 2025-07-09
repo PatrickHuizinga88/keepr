@@ -37,15 +37,16 @@ onMounted(async () => {
 </script>
 
 <template>
-<Page :title="$t('pricing.choose_your_plan')" :description="$t('pricing.ready_to_upgrade')">
+  <h1>{{ $t('pricing.choose_your_plan') }}</h1>
   <Pricing/>
   <Dialog v-model:open="open">
     <DialogContent class="text-center">
       <DialogHeader>
         <DialogTitle class="text-center">
-          {{ transactionSuccess ?
-            $t('pricing.upgrade_confirmation.title.success') :
-            $t('pricing.upgrade_confirmation.title.error')
+          {{
+            transactionSuccess ?
+                $t('pricing.upgrade_confirmation.title.success') :
+                $t('pricing.upgrade_confirmation.title.error')
           }}
         </DialogTitle>
       </DialogHeader>
@@ -56,7 +57,8 @@ onMounted(async () => {
         }}</p>
       <DialogFooter>
         <Button @click="open = false" :variant="transactionSuccess ? 'default' : 'outline'" class="w-full">
-          {{ transactionSuccess ?
+          {{
+            transactionSuccess ?
                 $t('pricing.upgrade_confirmation.action.success') :
                 $t('pricing.upgrade_confirmation.action.error')
           }}
@@ -64,7 +66,6 @@ onMounted(async () => {
       </DialogFooter>
     </DialogContent>
   </Dialog>
-</Page>
 </template>
 
 <style scoped>

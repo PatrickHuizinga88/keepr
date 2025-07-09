@@ -16,8 +16,7 @@ export default {
     },
 
     navigation: {
-      management: "Management",
-      dashboard: "Dashboard",
+      home: "Home",
       general: "General",
     },
 

@@ -5,8 +5,7 @@ import {useForm} from "vee-validate";
 import type {Database} from "~/types/database.types";
 
 const props = defineProps<{
-  first_name: string
-  last_name: string
+  name: string
 }>()
 
 const supabase = useSupabaseClient<Database>()
@@ -17,14 +16,12 @@ const {t} = useI18n()
 const loading = ref(false)
 
 const formSchema = toTypedSchema(z.object({
-  first_name: z.string(),
-  last_name: z.string()
+  name: z.string(),
 }))
 
 const form = useForm({
   initialValues: {
-    first_name: props.first_name || '',
-    last_name: props.last_name || '',
+    name: props.name || '',
   },
   validationSchema: formSchema,
 })
@@ -34,8 +31,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     loading.value = true
     const {error} = await supabase.from('profiles')
         .update({
-          first_name: values.first_name,
-          last_name: values.last_name,
+          name: values.name,
         })
         .eq('user_id', user.value?.id)
     if (error) throw error
@@ -59,20 +55,11 @@ const onSubmit = form.handleSubmit(async (values) => {
 <template>
   <form @submit="onSubmit" class="space-y-6">
     <div class="grid sm:grid-cols-2 gap-6">
-      <FormField v-slot="{ componentField }" name="first_name">
+      <FormField v-slot="{ componentField }" name="name">
         <FormItem>
-          <FormLabel>{{ $t('account.profile.first_name') }}</FormLabel>
+          <FormLabel>{{ $t('account.profile.name') }}</FormLabel>
           <FormControl>
             <Input type="text" placeholder="John" v-bind="componentField"/>
-          </FormControl>
-          <FormMessage/>
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="last_name">
-        <FormItem>
-          <FormLabel>{{ $t('account.profile.last_name') }}</FormLabel>
-          <FormControl>
-            <Input type="text" placeholder="Doe" v-bind="componentField"/>
           </FormControl>
           <FormMessage/>
         </FormItem>
