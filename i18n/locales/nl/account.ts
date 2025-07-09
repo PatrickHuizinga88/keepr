@@ -30,9 +30,12 @@ export default {
       theme: "Thema",
 
       themes: {
-        dark: "Donker",
-        light: "Licht",
-        system_default: "Systeemstandaard",
+        blue: "Blauw",
+        pink: "Roze",
+        green: "Groen",
+        red: "Rood",
+        purple: "Paars",
+        orange: "Oranje",
       },
       select_a_language: "Selecteer een taal",
       select_a_theme: "Selecteer een thema",

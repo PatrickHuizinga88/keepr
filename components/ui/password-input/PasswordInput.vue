@@ -30,7 +30,7 @@ const modelValue = useVModel(props, 'modelValue', emits, {
         :class="cn('pr-10', props.class)"
         :type="!showPassword ? 'password' : 'text'"
         v-bind="$attrs"/>
-    <Button @click="showPassword = !showPassword" type="button" variant="ghost" size="icon" :aria-label="$t('authentication.common.toggle_password_visibility')" class="absolute inset-y-0 right-0 text-muted-foreground hover:bg-transparent hover:text-foreground">
+    <Button @click="showPassword = !showPassword" type="button" variant="ghost" size="icon-sm" :aria-label="$t('authentication.common.toggle_password_visibility')" class="absolute inset-y-0 right-0 text-muted-foreground hover:bg-transparent hover:text-foreground">
       <Eye v-if="!showPassword" class="size-4"/>
       <EyeOff v-else class="size-4"/>
     </Button>

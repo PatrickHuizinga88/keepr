@@ -30,9 +30,12 @@ export default {
       theme: "Theme",
 
       themes: {
-        dark: "Dark",
-        light: "Light",
-        system_default: "System default",
+        blue: "Blue",
+        pink: "Pink",
+        green: "Green",
+        red: "Red",
+        purple: "Purple",
+        orange: "Orange",
       },
       select_a_language: "Select a language",
       select_a_theme: "Select a theme",

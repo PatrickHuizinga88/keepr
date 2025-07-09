@@ -94,6 +94,7 @@ export default defineNuxtConfig({
           'en/home.ts',
           'en/feedback.ts',
           'en/legal.ts',
+          'en/memories.ts',
           'en/pricing.ts',
         ]
       },
@@ -108,6 +109,7 @@ export default defineNuxtConfig({
           'nl/home.ts',
           'nl/feedback.ts',
           'nl/legal.ts',
+          'nl/memories.ts',
           'nl/pricing.ts',
         ]
       },

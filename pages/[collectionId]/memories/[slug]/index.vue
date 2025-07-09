@@ -31,7 +31,7 @@ const orderedSections = computed(() => {
     <img v-if="memory.cover_image" :src="memory.cover_image" :alt="memory.title" class="absolute inset-0 object-cover">
     <div v-else class="absolute inset-0 bg-primary"></div>
     <div class="absolute inset-0 bg-black/40"></div>
-    <div class="relative container">
+    <div class="relative container max-w-[900px]">
       <NuxtLink to="/">
         <Button size="sm" class="bg-background/50 backdrop-blur-md">
           <ArrowLeft/>
@@ -39,7 +39,7 @@ const orderedSections = computed(() => {
         </Button>
       </NuxtLink>
     </div>
-    <div class="relative container text-white">
+    <div class="relative container max-w-[900px] text-white">
       <h1>{{ memory.title }}</h1>
       <div class="flex items-center font-medium">
         {{ memory.location }}
@@ -49,7 +49,7 @@ const orderedSections = computed(() => {
     </div>
   </div>
 
-  <div class="container">
+  <div class="container max-w-[900px]">
     <p class="font-cursive text-lg/8 my-6">{{ memory.content }}</p>
 
     <div class="space-y-6">

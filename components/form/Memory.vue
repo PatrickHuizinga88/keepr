@@ -47,7 +47,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       slug: slugify(values.title),
       location: values.location,
       content: values.content,
-      cover_image: values.cover_image,
+      // cover_image: values.cover_image, TODO: Fix cover image handling
       date_from: values.date_from,
       date_to: values.date_to,
       created_by: user.value.id,
