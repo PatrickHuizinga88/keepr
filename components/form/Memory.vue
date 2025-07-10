@@ -3,6 +3,8 @@ import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
 import {useForm} from "vee-validate";
 import type {Database, Tables} from "~/types/database.types";
+import {PlusCircle} from "lucide-vue-next";
+import {v4 as uuidv4} from 'uuid'
 
 const props = defineProps<{
   memory?: Tables<'memories'>
@@ -21,6 +23,15 @@ const formSchema = toTypedSchema(z.object({
   cover_image: z.string().optional(),
   date_from: z.string().optional(),
   date_to: z.string().optional(),
+  sections: z.array(z.object({
+    content: z.string(),
+    media: z
+      .union([
+        z.instanceof(File),
+        z.array(z.instanceof(File))
+      ])
+      .optional()
+  })).optional()
 }))
 
 const form = useForm({
@@ -31,16 +42,34 @@ const form = useForm({
     cover_image: props.memory?.cover_image || '',
     date_from: props.memory?.date_from || '',
     date_to: props.memory?.date_to || '',
+    sections: props.memory?.memory_sections || [],
   },
   validationSchema: formSchema,
 })
 
 const loading = ref(false)
+const sections = ref<Tables<'memory_sections'>[]>(props.memory?.sections || [])
+
+const sortedSections = computed(() => {
+  return sections.value.sort((
+    a: Tables<'memory_sections'>,
+    b: Tables<'memory_sections'>
+  ) => a.order_index - b.order_index)
+})
+
+const addSection = () => {
+  sections.value.push({
+    id: uuidv4(),
+    memory_id: props.memory?.id,
+    content: '',
+    order_index: sections.value.length + 1,
+  })
+}
 
 const onSubmit = form.handleSubmit(async (values) => {
   try {
     loading.value = true
-    const {data, error} = await supabase.from('memories').upsert({
+    const {data: memory, error: memoryError} = await supabase.from('memories').upsert({
       id: props.memory?.id,
       collection_id: route.params.collectionId,
       title: values.title,
@@ -54,8 +83,20 @@ const onSubmit = form.handleSubmit(async (values) => {
     }, {
       onConflict: 'id'
     }).select()
-    if (error) throw error
-    await navigateTo(localePath({name: 'collectionId-memories-slug', params: {collectionId: route.params.collectionId, slug: slugify(values.title)}}))
+    if (memoryError) throw memoryError
+
+    const {error: sectionsError} = await supabase.from('memory_sections').upsert(
+      {
+        onConflict: 'id'
+      }
+    )
+    if (sectionsError) throw sectionsError
+
+    await navigateTo(localePath({
+      name: 'collectionId-memories-slug',
+      params: {collectionId: route.params.collectionId, slug: slugify(values.title)}
+    }))
+
     toastStore.createToast({
       type: 'success',
       action: 'save',
@@ -137,6 +178,35 @@ const onSubmit = form.handleSubmit(async (values) => {
         </FormItem>
       </FormField>
     </div>
+
+    <h2>{{ $t('memories.sections', 2) }}</h2>
+
+    <div v-for="(section, index) in sortedSections">
+      <FormField v-slot="{ componentField }" :name="`sections[${index}].content`">
+        <FormItem>
+          <FormLabel>{{ $t('memories.content') }}</FormLabel>
+          <FormControl>
+            <Textarea v-bind="componentField" rows="6"/>
+          </FormControl>
+          <FormMessage/>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" :name="`sections[${index}].media`">
+        <FormItem>
+          <FormLabel>{{ $t('memories.sections.media') }}</FormLabel>
+          <FormControl>
+            <Input type="file" v-bind="componentField"/>
+          </FormControl>
+          <FormMessage/>
+        </FormItem>
+      </FormField>
+    </div>
+
+    <Button @click="addSection" type="button" variant="outline" class="w-full">
+      <PlusCircle/>
+      {{ $t('common.actions.add_item', {item: $t('memories.sections', 1)}) }}
+    </Button>
 
     <Button :loading="loading" class="w-full lg:w-auto">
       {{ capitalizeSentence($t('common.actions.save_item', {item: $t('memories.memories', 1)})) }}
