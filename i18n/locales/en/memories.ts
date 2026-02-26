@@ -8,5 +8,9 @@ export default {
     cover_image: "Cover Image",
     date_from: "Date From",
     date_to: "Date To",
+
+    sections: {
+      sections: "Section | Sections",
+    },
   }
 }

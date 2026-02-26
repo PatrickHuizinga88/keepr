@@ -3,8 +3,20 @@ import {UserCircle} from 'lucide-vue-next'
 import Toaster from "~/components/ui/toast/Toaster.vue";
 import {APP_NAME as appName} from "~/constants";
 import {useToastStore} from "~/stores/toastStore";
+import type {Database} from "~/types/database.types";
 
+const supabase = useSupabaseClient<Database>()
+const user = useSupabaseUser()
 const toastStore = useToastStore()
+
+const {data: theme} = await useAsyncData('theme', async () => {
+  const {data: profile} = await supabase.from('profiles')
+    .select('theme')
+    .eq('user_id', user.value?.id)
+    .single()
+  return profile.theme
+})
+useGlobalHead(theme.value)
 </script>
 
 <template>

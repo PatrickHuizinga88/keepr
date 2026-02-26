@@ -16,33 +16,33 @@ const languageOptions =
       label: locale.name
     }))
 
-const themeOptions = [{
-  value: 'light',
-  label: t('account.preferences.themes.light')
-}, {
-  value: 'dark',
-  label: t('account.preferences.themes.dark')
-}, {
-  value: 'system',
-  label: t('account.preferences.themes.system_default')
-}]
+// const themeOptions = [{
+//   value: 'light',
+//   label: t('account.preferences.themes.light')
+// }, {
+//   value: 'dark',
+//   label: t('account.preferences.themes.dark')
+// }, {
+//   value: 'system',
+//   label: t('account.preferences.themes.system_default')
+// }]
 
 const formSchema = toTypedSchema(z.object({
   language: z.enum(['en', 'nl']),
-  theme: z.string()
+  // theme: z.string()
 }))
 
 const form = useForm({
   initialValues: {
     language: locale.value,
-    theme: colorMode.preference
+    // theme: colorMode.preference
   },
   validationSchema: formSchema,
 })
 
 const onSubmit = form.handleSubmit(async (values) => {
   loading.value = true
-  colorMode.preference = values.theme
+  // colorMode.preference = values.theme
   await setLocale(values.language)
   await router.push({
     query: {refresh: 'true'}
@@ -81,23 +81,23 @@ onMounted(() => {
           </Select>
         </FormItem>
       </FormField>
-      <FormField v-slot="{ componentField }" name="theme">
-        <FormItem>
-          <FormLabel>{{ $t('account.preferences.theme') }}</FormLabel>
-          <Select v-bind="componentField">
-            <FormControl>
-              <SelectTrigger class="w-full">
-                <SelectValue :placeholder="$t('account.preferences.select_a_theme')"/>
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem v-for="option in themeOptions" :value="option.value">
-                {{ option.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </FormItem>
-      </FormField>
+<!--      <FormField v-slot="{ componentField }" name="theme">-->
+<!--        <FormItem>-->
+<!--          <FormLabel>{{ $t('account.preferences.theme') }}</FormLabel>-->
+<!--          <Select v-bind="componentField">-->
+<!--            <FormControl>-->
+<!--              <SelectTrigger class="w-full">-->
+<!--                <SelectValue :placeholder="$t('account.preferences.select_a_theme')"/>-->
+<!--              </SelectTrigger>-->
+<!--            </FormControl>-->
+<!--            <SelectContent>-->
+<!--              <SelectItem v-for="option in themeOptions" :value="option.value">-->
+<!--                {{ option.label }}-->
+<!--              </SelectItem>-->
+<!--            </SelectContent>-->
+<!--          </Select>-->
+<!--        </FormItem>-->
+<!--      </FormField>-->
     </div>
     <div class="flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-4">
       <Button :loading="loading">

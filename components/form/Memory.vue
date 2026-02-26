@@ -5,9 +5,11 @@ import {useForm} from "vee-validate";
 import type {Database, Tables} from "~/types/database.types";
 import {PlusCircle} from "lucide-vue-next";
 import {v4 as uuidv4} from 'uuid'
+import MultiImageUpload from "~/components/MultiImageUpload.vue";
 
 const props = defineProps<{
   memory?: Tables<'memories'>
+  collectionId: string | number
 }>()
 
 const toastStore = useToastStore()
@@ -20,17 +22,16 @@ const formSchema = toTypedSchema(z.object({
   title: z.string(),
   location: z.string().optional(),
   content: z.string(),
-  cover_image: z.string().optional(),
-  date_from: z.string().optional(),
+  cover_image: z
+      .string()
+      .optional(),
+  date_from: z.string(),
   date_to: z.string().optional(),
   sections: z.array(z.object({
     content: z.string(),
-    media: z
-      .union([
-        z.instanceof(File),
-        z.array(z.instanceof(File))
-      ])
-      .optional()
+    media: z.array(
+        z.string()
+    )
   })).optional()
 }))
 
@@ -48,12 +49,13 @@ const form = useForm({
 })
 
 const loading = ref(false)
-const sections = ref<Tables<'memory_sections'>[]>(props.memory?.sections || [])
+const dateRange = ref(false)
+const sections = ref<Tables<'memory_sections'>[]>(props.memory?.memory_sections || [])
 
 const sortedSections = computed(() => {
   return sections.value.sort((
-    a: Tables<'memory_sections'>,
-    b: Tables<'memory_sections'>
+      a: Tables<'memory_sections'>,
+      b: Tables<'memory_sections'>
   ) => a.order_index - b.order_index)
 })
 
@@ -75,10 +77,10 @@ const onSubmit = form.handleSubmit(async (values) => {
       title: values.title,
       slug: slugify(values.title),
       location: values.location,
+      cover_image: values.cover_image || null,
       content: values.content,
-      // cover_image: values.cover_image, TODO: Fix cover image handling
-      date_from: values.date_from,
-      date_to: values.date_to,
+      date_from: values.date_from || null,
+      date_to: values.date_to || null,
       created_by: user.value.id,
     }, {
       onConflict: 'id'
@@ -86,11 +88,37 @@ const onSubmit = form.handleSubmit(async (values) => {
     if (memoryError) throw memoryError
 
     const {error: sectionsError} = await supabase.from('memory_sections').upsert(
-      {
-        onConflict: 'id'
-      }
+        sections.value.map((section, index) => ({
+          id: section.id,
+          memory_id: memory[0].id,
+          content: values.sections[index].content,
+          order_index: section.order_index,
+          created_at: section.created_at || new Date().toISOString(),
+        })),
+        {
+          onConflict: 'id'
+        }
     )
     if (sectionsError) throw sectionsError
+
+    const sectionMediaFiles = values.sections.flatMap(section =>
+        section.media ? section.media.map((mediaUrl: string) => ({
+          id: uuidv4(),
+          memory_id: memory[0].id,
+          section_id: section.id,
+          url: `${props.collectionId}/${mediaUrl}`,
+          type: 'image',
+          created_by: user.value.id,
+        })) : []
+    );
+
+    const {error: mediaError} = await supabase.from('media').upsert(
+        sectionMediaFiles,
+        {
+          onConflict: 'url'
+        }
+    )
+    if (mediaError) throw mediaError
 
     await navigateTo(localePath({
       name: 'collectionId-memories-slug',
@@ -116,7 +144,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 </script>
 
 <template>
-  <form @submit="onSubmit" class="space-y-6">
+  <form @submit="onSubmit" class="space-y-12">
     <div class="grid sm:grid-cols-2 gap-6">
       <FormField v-slot="{ componentField }" name="title">
         <FormItem>
@@ -152,23 +180,30 @@ const onSubmit = form.handleSubmit(async (values) => {
       <FormItem>
         <FormLabel>{{ $t('memories.cover_image') }}</FormLabel>
         <FormControl>
-          <Input v-bind="componentField" type="text"/>
+          <!--          <FileInput v-bind="componentField"/>-->
+          <ImageUpload v-bind="componentField" :collection-id="props.collectionId" accept="image/*"/>
         </FormControl>
         <FormMessage/>
       </FormItem>
     </FormField>
 
     <div class="grid sm:grid-cols-2 gap-6">
-      <FormField v-slot="{ componentField }" name="date_from">
-        <FormItem>
-          <FormLabel>{{ $t('memories.date_from') }}</FormLabel>
-          <FormControl>
-            <Input v-bind="componentField" type="date"/>
-          </FormControl>
-          <FormMessage/>
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="date_to">
+      <div class="space-y-4">
+        <FormField v-slot="{ componentField }" name="date_from">
+          <FormItem>
+            <FormLabel>{{ $t('memories.date_from') }}</FormLabel>
+            <FormControl>
+              <Input v-bind="componentField" type="date"/>
+            </FormControl>
+            <FormMessage/>
+          </FormItem>
+        </FormField>
+        <div class="flex items-center space-x-2">
+          <Switch id="date-range-switch" :model-value="dateRange" @update:model-value="dateRange = !dateRange"/>
+          <Label for="date-range-switch">Meerdere dagen</Label>
+        </div>
+      </div>
+      <FormField v-if="dateRange" v-slot="{ componentField }" name="date_to">
         <FormItem>
           <FormLabel>{{ $t('memories.date_to') }}</FormLabel>
           <FormControl>
@@ -179,34 +214,36 @@ const onSubmit = form.handleSubmit(async (values) => {
       </FormField>
     </div>
 
-    <h2>{{ $t('memories.sections', 2) }}</h2>
+    <div class="space-y-6">
+      <h2>{{ $t('memories.sections.sections', 2) }}</h2>
 
-    <div v-for="(section, index) in sortedSections">
-      <FormField v-slot="{ componentField }" :name="`sections[${index}].content`">
-        <FormItem>
-          <FormLabel>{{ $t('memories.content') }}</FormLabel>
-          <FormControl>
-            <Textarea v-bind="componentField" rows="6"/>
-          </FormControl>
-          <FormMessage/>
-        </FormItem>
-      </FormField>
+      <div v-for="(section, index) in sortedSections" class="space-y-6">
+        <FormField v-slot="{ componentField }" :name="`sections[${index}].content`">
+          <FormItem>
+            <FormLabel>{{ $t('memories.content') }}</FormLabel>
+            <FormControl>
+              <Textarea v-bind="componentField" rows="6"/>
+            </FormControl>
+            <FormMessage/>
+          </FormItem>
+        </FormField>
 
-      <FormField v-slot="{ componentField }" :name="`sections[${index}].media`">
-        <FormItem>
-          <FormLabel>{{ $t('memories.sections.media') }}</FormLabel>
-          <FormControl>
-            <Input type="file" v-bind="componentField"/>
-          </FormControl>
-          <FormMessage/>
-        </FormItem>
-      </FormField>
+        <FormField v-slot="{ componentField }" :name="`sections[${index}].media`">
+          <FormItem>
+            <FormLabel>{{ $t('memories.sections.media') }}</FormLabel>
+            <FormControl>
+              <MultiImageUpload v-bind="componentField" :collection-id="props.collectionId" accept="image/*"/>
+            </FormControl>
+            <FormMessage/>
+          </FormItem>
+        </FormField>
+      </div>
+
+      <Button @click="addSection" type="button" variant="outline" class="w-full">
+        <PlusCircle/>
+        {{ $t('common.actions.add_item', {item: $t('memories.sections.sections', 1)}) }}
+      </Button>
     </div>
-
-    <Button @click="addSection" type="button" variant="outline" class="w-full">
-      <PlusCircle/>
-      {{ $t('common.actions.add_item', {item: $t('memories.sections', 1)}) }}
-    </Button>
 
     <Button :loading="loading" class="w-full lg:w-auto">
       {{ capitalizeSentence($t('common.actions.save_item', {item: $t('memories.memories', 1)})) }}

@@ -10,7 +10,7 @@ export default {
     date_to: "Datum tot",
 
     sections: {
-      section: "Sectie | Secties",
+      sections: "Sectie | Secties",
     }
   }
 }

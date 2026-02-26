@@ -4,7 +4,7 @@ import type {Database} from "~/types/database.types";
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 const toastStore = useToastStore()
-const {t, locale} = useI18n()
+const {t} = useI18n()
 const localePath = useLocalePath()
 const dayjs = useDayjs()
 
@@ -34,10 +34,9 @@ const {data: collection} = await useAsyncData('collection', async () => {
   const {data: collection, error: collectionError} = await supabase.from('collections')
     .select('*, memories(*)')
     .eq('id', collectionMember.collection_id)
+    .order('date_to', {referencedTable: 'memories', ascending: false})
     .single()
   if (collectionError) throw collectionError
-
-  // TODO: Sort memories by date_to
 
   return collection
 })

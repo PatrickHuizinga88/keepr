@@ -20,7 +20,7 @@ const typeClass = computed(() => {
 </script>
 
 <template>
-  <div v-if="show" class="group relative pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-background border border-border shadow-lg">
+  <div v-if="show" class="group relative pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white border border-border shadow-lg">
     <div class="p-4 pt-2">
       <div class="flex items-start">
         <div v-if="type" class="lex-shrink-0 mr-3">
