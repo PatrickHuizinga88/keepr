@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:supabase.com)",
+      "mcp__mcp-server-supabase__list_projects",
+      "mcp__mcp-server-supabase__list_tables",
+      "Bash(xargs grep -l \"\\\\.from\\(\")",
+      "mcp__mcp-server-supabase__apply_migration",
+      "mcp__mcp-server-supabase__execute_sql",
+      "mcp__mcp-server-supabase__generate_typescript_types",
+      "Bash(ls /c/Users/patri/Repositories/Personal/Vue/keepr/app/pages/[collectionId]/)",
+      "Bash(supabase projects list)"
+    ]
+  }
+}
