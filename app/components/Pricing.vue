@@ -4,7 +4,9 @@ import { CheckCircle } from "lucide-vue-next";
 import type { Database } from "~~/types/database.types";
 
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const toastStore = useToastStore();
 const { t } = useI18n();
 const loading = ref("");
@@ -30,11 +32,11 @@ const plans = [
     lookupKey: "premium_monthly",
     name: "Premium plan",
     description: "Better for growing teams that want to scale their business.",
-    pricing: "29",
+    pricing: "1.99",
     featuresTitle: "Everything in Free plan, plus:",
     features: [
       { name: "Advanced analytics & insights" },
-      { name: "Unlimited users" },
+      { name: "Unlimited collectionsf" },
       { name: "Priority support" },
       { name: "Custom branding" },
     ],
@@ -44,11 +46,7 @@ const plans = [
 ];
 
 const { data: profile } = await useAsyncData("profile", async () => {
-  const { data } = await supabase
-    .from("profiles")
-    .select("plan")
-    .eq("user_id", user.value?.id)
-    .single();
+  const { data } = await supabase.from("profiles").select("plan").eq("user_id", user.id).single();
   return data;
 });
 
@@ -66,7 +64,7 @@ const checkout = async (lookupKey?: string) => {
     const url = await $fetch("/api/stripe/create-checkout-session", {
       query: {
         lookupKey,
-        stripeCustomerId: user.value?.user_metadata.stripe_customer_id,
+        stripeCustomerId: user.user_metadata.stripe_customer_id,
       },
     });
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Database } from "~~/types/database.types";
+import { Users } from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>();
 const {
@@ -36,7 +37,7 @@ const { data: collections } = await useAsyncData("collections", async () => {
 
   const { data: collectionsData, error: collectionsError } = await supabase
     .from("collections")
-    .select("*, memories(id), collection_members(user_id)")
+    .select("*, memories(id), collection_members(user_id), cover_color")
     .in("id", collectionIds);
 
   if (collectionsError) throw collectionsError;
@@ -61,25 +62,6 @@ const { data: collections } = await useAsyncData("collections", async () => {
   }));
 });
 
-const COVER_COLORS = [
-  "#FDE8E8",
-  "#FEF3C7",
-  "#D1FAE5",
-  "#DBEAFE",
-  "#EDE9FE",
-  "#FCE7F3",
-  "#E0F2FE",
-  "#F0FDF4",
-];
-
-function getCoverColor(id: string): string {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  }
-  return COVER_COLORS[hash % COVER_COLORS.length];
-}
-
 function formatMembers(names: string[]): string {
   if (names.length === 0) return "";
   if (names.length === 1) return names[0];
@@ -102,23 +84,27 @@ function formatMembers(names: string[]): string {
         v-for="collection in collections"
         :key="collection.id"
         :to="`/${collection.id}`"
-        class="book-link group flex flex-col items-start no-underline cursor-pointer"
+        class="group flex flex-col items-start no-underline cursor-pointer"
       >
         <div
-          class="book relative aspect-[2/3] ml-3.5 mb-5 w-[calc(100%-14px)] transition-transform duration-200 group-hover:-translate-y-1"
-          :style="{ '--cover': getCoverColor(collection.id) }"
+          class="book relative aspect-2/3 ml-1 mb-5 w-[calc(100%-14px)] transition-transform duration-200"
+          :style="{ '--cover': collection.cover_color }"
         >
           <span
-            class="absolute bottom-3.5 left-3 right-3 text-sm font-semibold leading-snug break-words text-black/70"
+            class="absolute bottom-3.5 left-4 right-3 text-2xl font-semibold leading-snug wrap-break-word text-black/70"
           >
             {{ collection.name || $t("home.untitled_collection") }}
           </span>
         </div>
 
         <div class="mt-3.5 text-left w-full">
-          <p class="text-sm font-medium text-foreground truncate">
-            {{ formatMembers(collection.memberNames) }}
-          </p>
+          <div class="flex items-center gap-2">
+            <Users class="size-4" />
+            <p class="text-sm font-medium text-foreground truncate">
+              {{ formatMembers(collection.memberNames) }}
+            </p>
+          </div>
+
           <p class="text-xs text-muted-foreground mt-0.5">
             {{ $t("home.memories_count", collection.memoryCount) }}
           </p>
@@ -137,10 +123,12 @@ function formatMembers(names: string[]): string {
   background-color: var(--cover);
   background-image:
     /* Binding shadow on left edge */
-    linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 5%),
-    /* Gloss */ linear-gradient(150deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%);
-  border-radius: 2px 4px 4px 2px;
-  box-shadow: 2px 6px 20px rgba(0, 0, 0, 0.15);
+    linear-gradient(to right, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 5%),
+    /* Gloss */ linear-gradient(250deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 45%),
+    /* Shadow on the bottom edge */
+    linear-gradient(to top, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 2%);
+  border-radius: 6px 8px 8px 6px;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Left spine — flush with cover top, same cover color darkened */
@@ -150,10 +138,10 @@ function formatMembers(names: string[]): string {
   left: -4px;
   right: 0px;
   top: 0;
-  height: calc(100% + 14px);
+  height: calc(100% + 20px);
   background-color: var(--cover);
   background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
-  border-radius: 10px 0 4px 4px;
+  border-radius: 10px 8px 8px 8px;
   z-index: -10;
 }
 
@@ -162,10 +150,10 @@ function formatMembers(names: string[]): string {
   content: "";
   position: absolute;
   top: 100%;
-  left: -1px;
-  right: 2px;
-  height: 12px;
+  left: 0px;
+  right: 3px;
+  height: 16px;
   background: repeating-linear-gradient(to bottom, #f2f2f2 0px, #c8c8c8 1px);
-  border-radius: 0 0px 1px 0;
+  border-radius: 6px 0 3px 6px;
 }
 </style>

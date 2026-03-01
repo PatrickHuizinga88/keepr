@@ -4,7 +4,9 @@ import type { Database } from "~~/types/database.types";
 import { SUPPORT_EMAIL as supportEmail } from "~~/constants";
 
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const { t } = useI18n();
 const toastStore = useToastStore();
 
@@ -16,7 +18,7 @@ const { data: profile } = await useAsyncData("accountProfile", async () => {
   const { data } = await supabase
     .from("profiles")
     .select("name,plan")
-    .eq("user_id", user.value?.id)
+    .eq("user_id", user.id)
     .single();
   return data;
 });
@@ -26,7 +28,7 @@ const navigateToStripeDashboard = async () => {
     const url = await $fetch("/api/stripe/create-portal-session", {
       method: "POST",
       query: {
-        stripeCustomerId: user.value?.user_metadata.stripe_customer_id,
+        stripeCustomerId: user.user_metadata.stripe_customer_id,
       },
     });
     if (!url) throw new Error("Failed to create portal session");
@@ -68,7 +70,7 @@ const navigateToStripeDashboard = async () => {
         <div class="space-y-1.5">
           <Label id="plan-label" as="span">{{ $t("account.billing.current_plan") }}</Label>
           <span class="block text-lg font-semibold text-primary" aria-describedby="plan-label">{{
-            $t(`pricing.plans.${profile.plan}`)
+            $t(`pricing.plans.${profile?.plan}`)
           }}</span>
         </div>
         <div class="space-y-3">
@@ -95,7 +97,7 @@ const navigateToStripeDashboard = async () => {
             </DialogContent>
           </Dialog>
           <Button
-            v-if="profile.plan !== 'free'"
+            v-if="profile?.plan !== 'free'"
             variant="outline"
             size="sm"
             @click="navigateToStripeDashboard()"

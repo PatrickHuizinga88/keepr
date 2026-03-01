@@ -6,7 +6,9 @@ import type { Database } from "~~/types/database.types";
 import { MessageSquare, CheckCircle, LoaderCircle } from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const toastStore = useToastStore();
 const { t } = useI18n();
 
@@ -48,7 +50,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     };
 
     const { error } = await supabase.from("feedback").insert({
-      user_id: user.value?.id,
+      user_id: user.id,
       category: values.category,
       content: values.message,
       browser_info: browserInfo,

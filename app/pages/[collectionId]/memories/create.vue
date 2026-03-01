@@ -11,7 +11,11 @@ const route = useRoute();
 <template>
   <div class="container max-w-5xl">
     <h1 class="my-8">
-      {{ $t("common.actions.add_item", { item: lowercase($t("memories.memories", 1)) }) }}
+      {{
+        capitalizeSentence(
+          $t("common.actions.add_item", { item: lowercase($t("memories.memories", 1)) }),
+        )
+      }}
     </h1>
     <FormMemory :collection-id="route.params.collectionId" />
   </div>

@@ -9,7 +9,9 @@ const props = defineProps<{
 }>();
 
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const toastStore = useToastStore();
 const { t } = useI18n();
 
@@ -36,7 +38,7 @@ const onSubmit = form.handleSubmit(async (values) => {
       .update({
         name: values.name,
       })
-      .eq("user_id", user.value?.id);
+      .eq("user_id", user.id);
     if (error) throw error;
     toastStore.createToast({
       type: "success",

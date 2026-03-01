@@ -11,7 +11,9 @@ const props = defineProps<{
 
 const toastStore = useToastStore();
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const { t } = useI18n();
 
 const loading = ref(false);
@@ -89,7 +91,7 @@ const onPasswordSubmit = async (values: any) => {
     }
     const { data, error: verificationError } = await supabase.rpc("verify_password", {
       current_plain_password: values.current_password,
-      current_id: user.value?.id,
+      current_id: user.id,
     });
     if (data === "incorrect") {
       passwordChangeMessage.value = t("authentication.validations.incorrect_current_password");

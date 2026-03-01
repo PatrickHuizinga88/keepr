@@ -14,7 +14,9 @@ const props = defineProps<{
 
 const toastStore = useToastStore();
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const localePath = useLocalePath();
 const route = useRoute();
 
@@ -85,7 +87,7 @@ const onSubmit = form.handleSubmit(async (values) => {
           content: values.content,
           date_from: values.date_from || null,
           date_to: values.date_to || null,
-          created_by: user.value.id,
+          created_by: user.id,
         },
         {
           onConflict: "id",
@@ -116,7 +118,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             section_id: section.id,
             url: `${props.collectionId}/${mediaUrl}`,
             type: "image",
-            created_by: user.value.id,
+            created_by: user.id,
           }))
         : [],
     );

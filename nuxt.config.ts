@@ -42,6 +42,7 @@ export default defineNuxtConfig({
       stripeKey: "",
     },
     stripeSecretKey: "",
+    inviteSecret: "",
   },
 
   modules: [
@@ -93,6 +94,7 @@ export default defineNuxtConfig({
           "en/404.ts",
           "en/account.ts",
           "en/authentication.ts",
+          "en/collections.ts",
           "en/home.ts",
           "en/feedback.ts",
           "en/legal.ts",
@@ -108,6 +110,7 @@ export default defineNuxtConfig({
           "nl/404.ts",
           "nl/account.ts",
           "nl/authentication.ts",
+          "nl/collections.ts",
           "nl/home.ts",
           "nl/feedback.ts",
           "nl/legal.ts",
@@ -121,6 +124,10 @@ export default defineNuxtConfig({
       account: {
         en: "/account",
         nl: "/account",
+      },
+      "join-token": {
+        en: "/join/[token]",
+        nl: "/joinen/[token]",
       },
       "collectionId-memories-slug": {
         en: "/[collectionId]/memories/[slug]",

@@ -6,14 +6,16 @@ import { useToastStore } from "~/stores/toastStore";
 import type { Database } from "~~/types/database.types";
 
 const supabase = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 const toastStore = useToastStore();
 
 const { data: theme } = await useAsyncData("theme", async () => {
   const { data: profile } = await supabase
     .from("profiles")
     .select("theme")
-    .eq("user_id", user.value?.id)
+    .eq("user_id", user.id)
     .single();
   return profile.theme;
 });

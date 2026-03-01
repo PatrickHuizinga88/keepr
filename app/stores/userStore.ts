@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { useSupabaseClient, useSupabaseUser } from '#imports';
+import { defineStore } from "pinia";
+import { useSupabaseClient, useSupabaseUser } from "#imports";
 
-export const useUserStore = defineStore('userStore', {
+export const useUserStore = defineStore("userStore", {
   state: () => ({
     role: null as string | null,
     user: null as any,
@@ -10,21 +10,23 @@ export const useUserStore = defineStore('userStore', {
   actions: {
     async fetchUserRole() {
       const supabase = useSupabaseClient();
-      const user = useSupabaseUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      this.user = user.value;
+      this.user = user;
 
       if (!this.user) return;
 
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', this.user.id)
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", this.user.id)
         .single();
 
       if (error) {
-        console.error('Rol ophalen mislukt:', error);
-        return
+        console.error("Rol ophalen mislukt:", error);
+        return;
       }
       this.role = data.role;
     },
