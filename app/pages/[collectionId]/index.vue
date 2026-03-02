@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Database } from "~~/types/database.types";
-import { ArrowLeft, PlusCircle, Settings2, MapPin } from "lucide-vue-next";
+import { ArrowLeft, PlusCircle, Settings2 } from "lucide-vue-next";
 
 const supabase = useSupabaseClient<Database>();
 const route = useRoute();
@@ -45,27 +45,6 @@ const { data: memories } = await useAsyncData("collection-memories", async () =>
   return data;
 });
 
-const memoriesByYear = computed(() => {
-  if (!memories.value?.length) return {} as Record<string, typeof memories.value>;
-  const groups: Record<string, typeof memories.value> = {};
-  for (const memory of memories.value) {
-    const year = memory.date_from
-      ? String(new Date(memory.date_from).getFullYear())
-      : t("collections.undated");
-    if (!groups[year]) groups[year] = [];
-    groups[year]!.push(memory);
-  }
-  return groups;
-});
-
-const sortedYears = computed(() =>
-  Object.keys(memoriesByYear.value).sort((a, b) => {
-    if (a === t("collections.undated")) return 1;
-    if (b === t("collections.undated")) return -1;
-    return Number(a) - Number(b);
-  }),
-);
-
 const coverImages = ref<Record<string, string>>({});
 
 onMounted(async () => {
@@ -92,18 +71,19 @@ const onCollectionUpdated = async () => {
   <div>
     <div
       class="relative h-44 flex flex-col justify-between overflow-hidden rounded-b-3xl"
-      :style="{ '--cover': collection?.cover_color || '#DBEAFE' }"
+      :style="{ 'background-color': collection?.cover_color || '#DBEAFE' }"
     >
       <div class="collection-header-bg absolute inset-0" />
 
-      <div class="relative container flex items-center justify-between pt-4">
+      <!-- Nav -->
+      <div class="relative container flex items-center justify-between pt-5">
         <NuxtLinkLocale to="/">
           <Button
             size="sm"
             variant="ghost"
-            class="bg-black/10 backdrop-blur-sm text-black/70 hover:bg-black/20 hover:text-black"
+            class="text-black/55 hover:text-black/80 hover:bg-black/8 gap-1"
           >
-            <ArrowLeft class="size-4" />
+            <ArrowLeft class="size-3.5" />
             {{ $t("common.actions.back") }}
           </Button>
         </NuxtLinkLocale>
@@ -111,7 +91,7 @@ const onCollectionUpdated = async () => {
         <Button
           size="sm"
           variant="ghost"
-          class="bg-black/10 backdrop-blur-sm text-black/70 hover:bg-black/20 hover:text-black"
+          class="text-black/55 hover:text-black/80 hover:bg-black/8"
           @click="editSheetOpen = true"
         >
           <Settings2 class="size-4" />
@@ -119,8 +99,9 @@ const onCollectionUpdated = async () => {
         </Button>
       </div>
 
-      <div class="relative container pb-5">
-        <h1 class="text-2xl font-semibold text-black/80">
+      <!-- Centered title, like a chapter heading inside the book -->
+      <div class="relative container text-center px-8 pt-5 pb-14">
+        <h1 class="text-3xl font-semibold text-black/70 leading-tight">
           {{ collection?.name || $t("home.untitled_collection") }}
         </h1>
         <p class="text-sm text-black/50 mt-0.5">
@@ -129,15 +110,11 @@ const onCollectionUpdated = async () => {
       </div>
     </div>
 
+    <!-- Page content -->
     <div class="container py-8">
-      <div class="flex justify-end mb-8">
+      <div class="flex justify-end mb-10">
         <NuxtLinkLocale
-          :to="
-            localePath({
-              name: 'collectionId-memories-create',
-              params: { collectionId },
-            })
-          "
+          :to="localePath({ name: 'collectionId-memories-create', params: { collectionId } })"
         >
           <Button>
             <PlusCircle class="size-4" />
@@ -150,70 +127,62 @@ const onCollectionUpdated = async () => {
         </NuxtLinkLocale>
       </div>
 
-      <div v-if="memories?.length" class="space-y-12">
-        <div v-for="year in sortedYears" :key="year">
-          <h2 class="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-4">
-            {{ year }}
-          </h2>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <NuxtLinkLocale
-              v-for="memory in memoriesByYear[year]"
-              :key="memory.id"
-              :to="
-                localePath({
-                  name: 'collectionId-memories-slug',
-                  params: { collectionId, slug: memory.slug },
-                })
-              "
-              class="no-underline group"
-            >
-              <div
-                class="rounded-2xl overflow-hidden bg-card border hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
-              >
-                <div
-                  class="h-40 relative overflow-hidden"
-                  :style="{ backgroundColor: collection?.cover_color || '#DBEAFE' }"
-                >
-                  <img
-                    v-if="coverImages[memory.id]"
-                    :src="coverImages[memory.id]"
-                    :alt="memory.title"
-                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div v-else class="absolute inset-0 bg-gradient-to-br from-white/20 to-black/5" />
-                </div>
-
-                <div class="p-4">
-                  <h3 class="font-semibold truncate">{{ memory.title }}</h3>
-                  <p v-if="memory.date_from" class="text-sm text-muted-foreground mt-0.5">
-                    {{ $dayjs(memory.date_from).format("D MMMM YYYY") }}
-                    <span v-if="memory.date_to">
-                      – {{ $dayjs(memory.date_to).format("D MMMM YYYY") }}
-                    </span>
-                  </p>
-                  <p
-                    v-if="memory.location"
-                    class="flex items-center gap-1 text-xs text-muted-foreground mt-1 truncate"
-                  >
-                    <MapPin class="size-3 shrink-0" />
-                    {{ memory.location }}
-                  </p>
-                </div>
-              </div>
-            </NuxtLinkLocale>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="text-center py-20">
-        <p class="text-muted-foreground mb-4">{{ $t("collections.no_memories") }}</p>
+      <!-- Polaroid grid -->
+      <div v-if="memories?.length" class="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-8">
         <NuxtLinkLocale
+          v-for="(memory, index) in memories"
+          :key="memory.id"
           :to="
             localePath({
-              name: 'collectionId-memories-create',
-              params: { collectionId },
+              name: 'collectionId-memories-slug',
+              params: { collectionId, slug: memory.slug },
             })
           "
+          class="no-underline"
+        >
+          <!-- Polaroid card: alternating slight tilt, snaps straight on hover -->
+          <div
+            class="polaroid bg-white shadow-[0_2px_10px_rgba(0,0,0,0.10)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.14)] hover:scale-[1.04] hover:rotate-0 transition-all duration-200 cursor-pointer"
+            :class="index % 2 === 0 ? '-rotate-[1deg]' : 'rotate-[1deg]'"
+          >
+            <!-- Photo area in the collection's cover color as placeholder -->
+            <div
+              class="aspect-square relative overflow-hidden"
+              :style="{ backgroundColor: collection?.cover_color || '#DBEAFE' }"
+            >
+              <img
+                v-if="coverImages[memory.id]"
+                :src="coverImages[memory.id]"
+                :alt="memory.title"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-else
+                class="absolute inset-0 book-cover"
+                :style="{ '--cover': collection?.cover_color || '#DBEAFE' }"
+              />
+            </div>
+
+            <!-- Caption — handwritten feel -->
+            <div class="text-center pt-3 pb-1 px-2">
+              <p class="font-cursive text-lg leading-snug text-black/60 truncate">
+                {{ memory.title }}
+              </p>
+              <p v-if="memory.date_from" class="text-black/30 mt-0.5">
+                {{ $dayjs(memory.date_from).format("D MMM YYYY") }}
+              </p>
+            </div>
+          </div>
+        </NuxtLinkLocale>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="text-center py-20">
+        <p class="font-cursive text-xl text-black/25 mb-6">
+          {{ $t("collections.no_memories") }}
+        </p>
+        <NuxtLinkLocale
+          :to="localePath({ name: 'collectionId-memories-create', params: { collectionId } })"
         >
           <Button variant="outline">
             <PlusCircle class="size-4" />
@@ -227,6 +196,7 @@ const onCollectionUpdated = async () => {
       </div>
     </div>
 
+    <!-- Edit sheet -->
     <Sheet v-model:open="editSheetOpen">
       <SheetContent side="right" class="sm:max-w-md overflow-y-auto">
         <SheetHeader class="mb-6">
@@ -253,10 +223,32 @@ const onCollectionUpdated = async () => {
 </template>
 
 <style scoped>
-.collection-header-bg {
+/* Same gloss + binding-shadow treatment as the book on the home page */
+.book-cover {
   background-color: var(--cover);
   background-image:
-    linear-gradient(250deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0) 40%);
+    linear-gradient(to right, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0) 7%),
+    linear-gradient(250deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0) 30%);
+}
+
+/* Darker strip on the left edge — the bound spine of the opened book */
+.book-spine {
+  background-color: var(--cover);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+}
+
+/* A thin white band at the bottom of the cover gives the feel of a page curling up underneath */
+.page-curl {
+  height: 18px;
+  background: white;
+  border-radius: 60% 60% 0 0 / 100% 100% 0 0;
+  opacity: 0.55;
+}
+
+/* Polaroid proportions: thin border on 3 sides, thick white strip at bottom for the caption */
+.polaroid {
+  padding: 6px 6px 36px;
+  border-radius: 2px;
 }
 </style>

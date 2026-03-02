@@ -78,7 +78,7 @@ function formatMembers(names: string[]): string {
 
     <div
       v-if="collections?.length"
-      class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-10"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-10"
     >
       <NuxtLinkLocale
         v-for="collection in collections"
@@ -105,7 +105,7 @@ function formatMembers(names: string[]): string {
             </p>
           </div>
 
-          <p class="text-xs text-muted-foreground mt-0.5">
+          <p class="text-xs text-muted-foreground mt-1">
             {{ $t("home.memories_count", collection.memoryCount) }}
           </p>
         </div>
